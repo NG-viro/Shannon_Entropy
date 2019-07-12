@@ -1,0 +1,149 @@
+
+###Shannon Entropy
+
+###sorted bam files from alignments are needed
+
+
+#############################
+###SNIPS
+for f in $fasta_file
+do for i in $data_names
+do freebayes -m 0 --min-coverage 100 -F 0.05 -i -u -X -f "$f"  -b $i/bwa_paired_"$i"_sorted.bam \
+-v $i/bwa_paired_"$i"_sorted_freebays_0.05.vcf
+done
+done
+for f in $data_names
+do cat $f/bwa_paired_"$f"_sorted_freebays_0.05.vcf \
+> $f/bwa_paired_"$f"_sorted_freebays_0.05.vcf.xls
+done
+
+
+##########################
+#write SNPS tables in one folder
+
+mkdir /home/fu/Documents/Quasi2
+
+for i in $data_names
+do 
+cp $i/bwa_paired_"$i"_sorted_freebays_0.05.vcf /home/fu/Documents/Quasi2/bwa_paired_"$i"_sorted_freebays_0.05.vcf
+done
+
+
+###change to folder with SNPS tables
+ 
+R
+
+files=list.files(full.name=TRUE)
+
+fi2=read.table(files[2], sep = ";")
+fi4=read.table(files[4], sep = ";")
+fi10=read.table(files[10], sep = ";")
+fi16=read.table(files[16], sep = ";")
+
+#for all files necessary
+#separates column by ";" 35, 37, 38, 40
+y=c(35,37,38,40)
+
+###########################
+
+##log is in R the ln; log10 is common log
+
+svg("main_Ent_ln.svg", height=15, width=10)
+
+par(mfrow=c(4,1), mar=c(0.5,0.5,0.5,0.5))
+
+######file2
+reads=fi2[,y]
+a=as.numeric(substring(reads[,1], 5))
+b=as.numeric(substring(reads[,2], 5))
+c=as.numeric(substring(reads[,3], 5))
+d=as.numeric(substring(reads[,4], 5))
+k=as.numeric((a+b)/(a+b+c+d))
+m=as.numeric((c+d)/(a+b+c+d))
+e=ifelse(k>0.95,1,k)
+f=ifelse(m<0.05,0,m)
+g=as.numeric(e*(log(e)))
+h=as.numeric(f*(log(f)))
+i=as.numeric(-(g+h))
+i[is.na(i)]<-0
+ent1=cbind(file2[,2],i)
+V1=seq(1:185000)
+d=rep(0,185000)
+Pos=cbind(V1,d)
+Ent_Pos=merge(Pos, ent1, by="V1",all.x=TRUE)
+Ent_Pos[is.na(Ent_Pos)] <- 0
+barplot(Ent_Pos[,"i"],ylim=c(0,0.8))
+
+####file4
+reads=fi4[,y]
+a=as.numeric(substring(reads[,1], 5))
+b=as.numeric(substring(reads[,2], 5))
+c=as.numeric(substring(reads[,3], 5))
+d=as.numeric(substring(reads[,4], 5))
+k=as.numeric((a+b)/(a+b+c+d))
+m=as.numeric((c+d)/(a+b+c+d))
+e=ifelse(k>0.95,1,k)
+f=ifelse(m<0.05,0,m)
+g=as.numeric(e*(log(e)))
+h=as.numeric(f*(log(f)))
+i=as.numeric(-(g+h))
+i[is.na(i)]<-0
+ent1=cbind(file4[,2],i)
+V1=seq(1:185000)
+d=rep(0,185000)
+Pos=cbind(V1,d)
+Ent_Pos=merge(Pos, ent1, by="V1",all.x=TRUE)
+Ent_Pos[is.na(Ent_Pos)] <- 0
+barplot(Ent_Pos[,"i"], ylim=c(0,0.8))
+
+####file10
+reads=fi10[,y]
+a=as.numeric(substring(reads[,1], 5))
+b=as.numeric(substring(reads[,2], 5))
+c=as.numeric(substring(reads[,3], 5))
+d=as.numeric(substring(reads[,4], 5))
+k=as.numeric((a+b)/(a+b+c+d))
+m=as.numeric((c+d)/(a+b+c+d))
+e=ifelse(k>0.95,1,k)
+f=ifelse(m<0.05,0,m)
+g=as.numeric(e*(log(e)))
+h=as.numeric(f*(log(f)))
+i=as.numeric(-(g+h))
+i[is.na(i)]<-0
+ent1=cbind(file10[,2],i)
+V1=seq(1:185000)
+d=rep(0,185000)
+Pos=cbind(V1,d)
+Ent_Pos=merge(Pos, ent1, by="V1",all.x=TRUE)
+Ent_Pos[is.na(Ent_Pos)] <- 0
+barplot(Ent_Pos[,"i"],  ylim=c(0,0.8))
+
+####file16
+reads=fi16[,y]
+a=as.numeric(substring(reads[,1], 5))
+b=as.numeric(substring(reads[,2], 5))
+c=as.numeric(substring(reads[,3], 5))
+d=as.numeric(substring(reads[,4], 5))
+k=as.numeric((a+b)/(a+b+c+d))
+m=as.numeric((c+d)/(a+b+c+d))
+e=ifelse(k>0.95,1,k)
+f=ifelse(m<0.05,0,m)
+g=as.numeric(e*(log(e)))
+h=as.numeric(f*(log(f)))
+i=as.numeric(-(g+h))
+i[is.na(i)]<-0
+ent1=cbind(file16[,2],i)
+V1=seq(1:185000)
+d=rep(0,185000)
+Pos=cbind(V1,d)
+Ent_Pos=merge(Pos, ent1, by="V1",all.x=TRUE)
+Ent_Pos[is.na(Ent_Pos)] <- 0
+barplot(Ent_Pos[,"i"],  ylim=c(0,0.8))
+
+dev.off()
+
+
+
+
+
+
